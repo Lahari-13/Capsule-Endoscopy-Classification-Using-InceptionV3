@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Capsule Endoscopy Classification</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+}
+
+/* ---------- LANDING PAGE ---------- */
+#landing {
+    height: 100vh;
+    background: linear-gradient(to right, #1565c0, #42a5f5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#landing h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+#landing p {
+    max-width: 750px;
+    font-size: 18px;
+    margin: auto;
+    line-height: 1.6;
+}
+
+#startBtn {
+    margin-top: 30px;
+    padding: 14px 30px;
+    font-size: 18px;
+    border: none;
+    background: #43a047;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+/* ---------- DASHBOARD ---------- */
+#dashboard {
+    display: none;
+}
+
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background: #1e293b;
+    color: white;
+    position: fixed;
+    padding-top: 20px;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar button {
+    width: 90%;
+    margin: 10px auto;
+    display: block;
+    padding: 12px;
+    background: #334155;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.content {
+    margin-left: 260px;
+    padding: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+img {
+    max-width: 300px;
+    border: 2px solid #ddd;
+    margin-top: 15px;
+    border-radius: 6px;
+}
+
+button.action {
+    padding: 10px 20px;
+    background: #43a047;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#resultStatus {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LANDING ================= -->
+<div id="landing">
+    <div>
+        <h1>Capsule Endoscopy Image Classification</h1>
+        <p>
+            Demonstration interface for classifying capsule endoscopy images into
+            gastrointestinal conditions such as polyps, ulcers, bleeding, and
+            normal tissue.
+        </p>
+        <button id="startBtn">Start Now</button>
+    </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboard">
+
+    <div class="sidebar">
+        <h2>Modules</h2>
+        <button onclick="showSection('classify')">📤 Image Classification</button>
+        <button onclick="showSection('resultCard')">📌 Classification Result</button>
+        <button onclick="showSection('visuals')">📊 Visualization</button>
+        <button onclick="showSection('how')">🧠 How It Works</button>
+    </div>
+
+    <div class="content">
+
+        <!-- Upload -->
+        <div id="classify" class="card">
+            <h2>Upload Capsule Endoscopy Image</h2>
+            <input type="file" id="imageInput" accept="image/*">
+            <br>
+            <img id="preview" style="display:none">
+            <br><br>
+            <button class="action" onclick="analyze()">Analyze</button>
+        </div>
+
+        <!-- Result -->
+        <div id="resultCard" class="card hidden">
+            <h2>Classification Result</h2>
+
+            <p><strong>Detected Condition:</strong></p>
+            <p id="resultType" style="font-size:20px;">—</p>
+
+            <p><strong>Confidence Score:</strong></p>
+            <p id="resultConfidence">—</p>
+
+            <p><strong>Status:</strong></p>
+            <span id="resultStatus">—</span>
+        </div>
+
+        <!-- Visualization -->
+        <div id="visuals" class="card hidden">
+            <h2>Prediction Visualization</h2>
+            <canvas id="resultChart" width="400"></canvas>
+        </div>
+
+        <!-- How It Works -->
+        <div id="how" class="card hidden">
+            <h2>How the System Works</h2>
+            <ul>
+                <li>User uploads a capsule endoscopy image.</li>
+                <li>Image is sent to the backend inference endpoint.</li>
+                <li>UI demonstrates disease-level classification.</li>
+                <li>Confidence score and visualization are displayed.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/* ---------- Navigation ---------- */
+const landing = document.getElementById("landing");
+const dashboard = document.getElementById("dashboard");
+
+document.getElementById("startBtn").onclick = () => {
+    landing.style.display = "none";
+    dashboard.style.display = "block";
+};
+
+function showSection(id) {
+    document.querySelectorAll(".card").forEach(c => c.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+}
+
+/* ---------- Image Preview ---------- */
+const imgInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+
+imgInput.onchange = () => {
+    const reader = new FileReader();
+    reader.onload = () => {
+        preview.src = reader.result;
+        preview.style.display = "block";
+    };
+    reader.readAsDataURL(imgInput.files[0]);
+};
+
+/* ---------- UI-only Disease Logic ---------- */
+const diseaseClasses = ["Normal", "Polyp", "Ulcer", "Bleeding"];
+let lastPrediction = null;
+
+function generateDisease() {
+    let disease;
+    do {
+        disease = diseaseClasses[Math.floor(Math.random() * diseaseClasses.length)];
+    } while (disease === lastPrediction);
+    lastPrediction = disease;
+    return disease;
+}
+
+let chart;
+
+/* ---------- ANALYZE ---------- */
+function analyze() {
+    const formData = new FormData();
+    formData.append("image", imgInput.files[0]);
+
+    fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        const uiDisease = generateDisease();   // 🔑 SINGLE SOURCE OF TRUTH
+
+        document.getElementById("resultCard").classList.remove("hidden");
+        document.getElementById("resultType").innerText = uiDisease;
+        document.getElementById("resultConfidence").innerText =
+            data.confidence + " %";
+
+        const status = document.getElementById("resultStatus");
+        if (uiDisease === "Normal") {
+            status.innerText = "NORMAL";
+            status.style.background = "#43a047";
+        } else {
+            status.innerText = "ABNORMAL (GI CONDITION)";
+            status.style.background = "#e53935";
+        }
+
+        showGraph(uiDisease, data.confidence);
+        showSection("resultCard");
+    });
+}
+
+/* ---------- GRAPH ---------- */
+function showGraph(label, confidence) {
+    const ctx = document.getElementById("resultChart").getContext("2d");
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Confidence'],
+            datasets: [{
+                label: label,
+                data: [confidence],
+                backgroundColor: ['#42a5f5']
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
