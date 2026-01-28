@@ -49,13 +49,13 @@ https://capsule-endoscopy-classification.onrender.com
 ----------------------------
 
 📍 Homepage  
-![Homepage](screenshots/home.png)
+![Homepage](screenshots/Homepage.png)
 
 📍 Image Upload Page  
-![Upload Page](screenshots/upload.png)
+![Upload Page](screenshots/Uploadpage.png)
 
 📍 Prediction Result Page  
-![Result Page](screenshots/result.png)
+![Result Page](screenshots/Result.png)
 
 ----------------------------
 🧠 Model Details
@@ -89,11 +89,6 @@ Integration with larger clinical datasets
 Performance optimization for faster inference
 
 Enhanced UI and accessibility
-
-⚠️ Disclaimer
-----------------------------
-This project is developed for academic and research purposes only.
-It is not intended to replace professional medical diagnosis.
 
 👤 Creator
 ----------------------------
