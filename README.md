@@ -14,15 +14,6 @@ evaluation metrics to ensure accurate predictions.
 
 ---
 
-🌐 Live Website
----------------
-🚀 Experience the application live!
-
-🔗 **Live Demo:**  
-https://capsule-endoscopy-classification.onrender.com
-
----
-
 ✨ Features
 -----------
 - Automated capsule endoscopy image classification
