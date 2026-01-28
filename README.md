@@ -48,13 +48,16 @@ https://capsule-endoscopy-classification.onrender.com
 📸 Screenshots of the Project
 ----------------------------
 
-📍 Homepage  
+📍HOMEPAGE  
+-------
 ![Homepage](screenshots/Homepage.png)
 
-📍 Image Upload Page  
+📍 IMAGE UPLOADPAGE
+-------
 ![Upload Page](screenshots/Uploadpage.png)
 
-📍 Prediction Result Page  
+📍 PREDICTION RESULTPAGE
+-------
 ![Result Page](screenshots/Result.png)
 
 ----------------------------
